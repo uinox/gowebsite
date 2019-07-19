@@ -1,0 +1,47 @@
+{{template "header"}}
+    <title>{{.Topic.Title}}</title>
+</head>
+<body>
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            {{template "navbar" .}}
+        </div>
+    </div>
+    <div class="container" style="margin-top:51px;">
+        {{$labels := .Labels}}
+        {{with .Topic}}
+        <h1>{{.Title}} <small>{{.Category}}</small></h1>
+        <h5>
+            {{range $labels}}
+            <a href="/?label={{.}}">{{.}}</a>
+            {{end}}
+        </h5>
+        {{.Content}}
+        <h5>Topic File：<a href="/attachment/{{.Attachment}}">{{.Attachment}}</a></h5>
+        {{end}}
+    </div>
+    
+    <div class="container">
+        {{$tid := .Topic.Id}}
+        {{$isLogin := .IsLogin}}
+        {{range .Replies}}
+        <h3>{{.Name}} <small>{{.Created}}</small>{{if $isLogin}} &nbsp;&nbsp; <small><a href="/reply/delete?tid={{$tid}}&rid={{.Id}}">Delete</a></small> {{end}} </h3>
+        {{.Content}}
+        {{end}}
+        <h3>Reply</h3>
+        <form action="/reply/add" method="post">
+            <input type="hidden" name="tid" value="{{.Topic.Id}}">
+            <div class="form-group">
+                <label>NickName</label>
+                <input type="text" name="nickname" id="" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Content</label>
+                <textarea name="content" id="" cols="30" rows="10" class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

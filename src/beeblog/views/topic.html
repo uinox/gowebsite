@@ -1,0 +1,47 @@
+{{template "header"}}
+    <title>Topic</title>
+</head>
+<body>
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            {{template "navbar" .}}
+        </div>
+    </div>
+    <div class="container" style="margin-top:51px;">
+        <h1>Topic List</h1>
+        <a href="/topic/add" class="btn btn-default">Add Topic</a>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <td>#</td>
+                    <td>Title</td>
+                    <td>Last Update</td>
+                    <td>Views</td>
+                    <td>ReplyCount</td>
+                    <td>LastReply</td>
+                    <td>Operation</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Topics}}
+                <tr>
+                    <td>{{ .Id}}</td>
+                    <td><a href="/topic/view/{{.Id}}">{{ .Title}}</a></td>
+                    <td>{{ .Updated}}</td>
+                    <td>{{ .Views}}</td>
+                    <td>{{ .ReplyCount}}</td>
+                    <td>{{ .ReplyTime}}</td>
+                    <td>
+                        <a href="/topic/modify/?tid={{.Id}}">Edit</a>
+                        <a href="/topic/delete?tid={{.Id}}">Delete</a>
+                    </td>
+                </tr>
+                {{end}}
+                
+            </tbody>
+        </table>
+        
+    </div>
+    
+</body>
+</html>
