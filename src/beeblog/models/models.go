@@ -29,7 +29,7 @@ type HomeData struct {
 
 const (
 	_DB_NAME   = "mysql"
-	_DB_DRIVER = "root:zhang1991@tcp(127.0.0.1:3306)/bee?charset=utf8&parseTime=true&loc=Local"
+	_DB_DRIVER = "root:Zhang1991#@tcp(127.0.0.1:3306)/bee?charset=utf8&parseTime=true&loc=Local"
 )
 
 type Category struct {
