@@ -2,21 +2,21 @@
     <div class="register">
         <form method="get" action="/login" ref="form">
             <div class="form-group">
-                <div>
+                <div class="form-group-content">
                     <label for="name">Account：</label>
                     <input type="text" @input="change" @change="change" class="form-control" id="name" placeholder="Enter account" name="name" value="">    
                 </div>
                 <span ref="nametip" v-if="nameError">格式不正确</span>
             </div>
             <div class="form-group">
-                <div>
+                <div class="form-group-content">
                     <label for="email">Email：</label>
                     <input type="email" @input="change" @change="change" class="form-control" id="email" pattern="" placeholder="Email" name="email" value="">    
                 </div>
                 <span ref="emailtip" v-if="emailError">格式不正确</span>
             </div>
             <div class="form-group">
-                <div>
+                <div class="form-group-content">
                     <label for="password">Password：</label>
                     <input type="password" @input="change" @change="change" class="form-control" id="password" pattern="\d{5,12}" placeholder="password" name="password" value="">    
                 </div>
@@ -122,5 +122,6 @@
 <style lang="css">
     .register{margin:50px auto;}
     .register label{width:100px;text-align: right;}
-    .register input{width: 300px;}
+    .register input{width: 120px;border:1px solid #ccc;border-radius:2px;padding-left:4px;}
+    .form-group-content{width:230px;margin:0 auto;}
 </style>

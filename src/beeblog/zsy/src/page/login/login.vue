@@ -65,14 +65,14 @@
                     processData:false,
                     contentType:false,
                     success:function(result){
-                        console.log(result);
+                        //console.log(result);
                         res = eval(result);   //eval将json数据解析成json对象
                     }
                 });
-                console.log(res);
+                //console.log(res);
                 if(res!=null){
                     ses.setItem("token",res.Name);
-                    console.log(ses.getItem("token"));
+                   // console.log(ses.getItem("token"));
                     var addr =Qs.parse(location.search.substring(1)).addr;
                     if(addr){
                         self.$router.push('/'+addr);
@@ -92,4 +92,5 @@
 <style lang="css">
     .login{margin:100px auto;}
     .login label{width:80px;text-align: right;}
+    .login input{border:1px solid #ccc;border-radius:2px;padding-left:4px;}
 </style>
