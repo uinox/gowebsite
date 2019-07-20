@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"beeblog/models"
-	"fmt"
-
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 )
@@ -17,24 +15,12 @@ type ResData struct {
 	Name   string
 }
 
-func (c *LoginatController) Get() {
-	isExit := c.Input().Get("exit") == "true"
-	if isExit {
-		c.Ctx.SetCookie("uname", "", -1, "/")
-		c.Ctx.SetCookie("pwd", "", -1, "/")
-		c.Redirect("/", 301)
-		return
-	}
-	c.TplName = "login.html"
-}
-
 func (c *LoginatController) Post() {
 
 	name := c.Input().Get("name")
 	password := c.Input().Get("password")
 
 	user, err := models.GetUser(name)
-	fmt.Println(user.Password)
 	if err != nil {
 		res := &ResData{
 			Status: 404,

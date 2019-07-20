@@ -29,8 +29,7 @@
                 items:[
                     {Title:"Home",url:"/home"},
                     {Title:"Category",url:"/category"},
-                    {Title:"Article",url:"/article"},
-                    {Title:"Tech",url:"/tech"}
+                    {Title:"Article",url:"/article"}
                 ],
                 addr:null,
                 userName:null

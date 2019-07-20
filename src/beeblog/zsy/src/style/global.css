@@ -25,7 +25,7 @@ header ul li, footer ul li{list-style-type:none;height:50px;line-height:50px;}
     text-align: center;
     color: #2c3e50;
 }
-#main{width: 90%;margin: 51px auto 100px;}
+#main{width: 90%;margin: 0 auto;padding:51px 0 100px;}
 
 .isActive{background-color:#e7e7e7}
 .nav{cursor: pointer;font-size: 14px;color: #555;}
@@ -58,3 +58,7 @@ header ul li, footer ul li{list-style-type:none;height:50px;line-height:50px;}
 #article_view .container h1{text-align: left;font-size:20px;}
 
 #tech{width: 90%;margin: 51px auto 100px; border: 1px solid #fff;}
+
+.login{margin:0 auto;padding-top:100px;}
+.login label{width:80px;text-align: right;}
+.login input{border:1px solid #ccc;border-radius:2px;padding-left:4px;}

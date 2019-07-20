@@ -72,14 +72,14 @@ export default new Router({
       name: 'article_view',
       component: Article_view
     },
-    {
+    /*{
       path: '/tech',
       name: 'tech',
       component: Tech,
       meta: {
         needLogin: false
       }
-    },
+    },*/
     {
       path: '/register',
       name: 'Register',

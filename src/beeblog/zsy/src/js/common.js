@@ -25,3 +25,7 @@ function res1(){
         }
     })
 }
+window.onload=function(){
+  var wh=window.screen.height;
+  document.body.style.height=wh+"px";
+}

@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <p style="color:red">您已注册成功！请 <a href="/">登录</a></p>
+        <p style="color:red;padding-top:100px;">您已注册成功！请 <a href="/">登录</a></p>
     </div>
 </template>
 <!-- <script type="text/javascript">
