@@ -42,6 +42,7 @@ func (this *RegisterController) Post() {
 
 
 	state := models.AddUser(name, password, email)
+	fmt.Println(state)
 	if state == 301 {
 		this.Data["json"] = &JSON{"301","用户已存在"}
 	}
@@ -50,7 +51,6 @@ func (this *RegisterController) Post() {
 	}
 	if state == 200 {
 		this.Data["json"] = &JSON{"200", "添加成功"}
-		return
 	}
 	this.ServeJSON()
 	return

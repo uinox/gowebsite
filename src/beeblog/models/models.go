@@ -498,12 +498,13 @@ func AddUser(name, password, email string) int {
 	}
 	qs := o.QueryTable("user")
 	err := qs.Filter("name", user.Name).One(user)
-	fmt.Println(err)
+
 	if err != nil {
 		_, err = o.Insert(user)
 		if err != nil {
 			return 304
 		}
+
 		return 200
 	}
 
