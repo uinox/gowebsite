@@ -54,13 +54,10 @@
                   return
                 }
                 var self=this;
-                var formData=new FormData(self.$refs.form);
                 var name=String(self.$refs.form.name.value);
-                var password=self.$refs.form.password.value;
-                var autoLogin=self.$refs.form.autoLogin.value;
-                formData.append('name',name);
-                formData.append('password',password);
-                formData.append('autoLogin',autoLogin);
+                var password=String(self.$refs.form.password.value);
+                var autoLogin=self.$refs.form.autoLogin.value;		
+		var formData={'name':name,'password':password,'autoLogin':autoLogin};
                 var res=null;
                 var url;
                 url='http://www.tmubei.com:8080/loginat';
@@ -71,17 +68,15 @@
                     type:"post",
                     url:url,
                     async: false,
-                    data:formData,  //
-                    // contentType:"application/json",
-                    contentType:false,
+                    data:JSON.stringify(formData),  //
+                    contentType:"application/x-www-form-urlencoded",
                     dataType:'json',
                     processData:false,
-                    contentType:false,
                     success:function(result){
                         res = eval(result);   //eval将json数据解析成json对象
 
                     }
-                });
+               });
                 if(res!=null){
                   if(res.Status=="404"){
                     this.errShow=true;
@@ -97,9 +92,9 @@
                     ses.setItem("token",res.Name);
                     var addr =Qs.parse(location.search.substring(1)).addr;
                     if(addr){
-                        self.$router.push('/'+addr);
+                       self.$router.push('/'+addr);
                     }else{
-                        self.$router.push('/home');
+                       self.$router.push('/home');
                     }
                   }
 

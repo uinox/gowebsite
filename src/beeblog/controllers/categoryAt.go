@@ -35,7 +35,6 @@ func (this *GetCategoryAtController) GetCategoryAt() {
 			beego.Error(err)
 		}
 
-		return
 	case "del":
 		// id := this.Input().Get("id")
 		id := ss.Id
@@ -49,7 +48,6 @@ func (this *GetCategoryAtController) GetCategoryAt() {
 			beego.Error(err)
 		}
 
-		return
 	}
 
 	categories, err := models.GetAllCategories()

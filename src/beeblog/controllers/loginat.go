@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"beeblog/models"
+	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 )
@@ -17,8 +19,19 @@ type ResData struct {
 
 func (c *LoginatController) Post() {
 
-	name := c.Input().Get("name")
-	password := c.Input().Get("password")
+	//name := c.Input().Get("name")
+	//password := c.Input().Get("password")
+
+	var Person models.User
+
+	data := c.Ctx.Input.RequestBody
+	err := json.Unmarshal([]byte(data),&Person)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	name := Person.Name
+	password := Person.Password
 
 	user, err := models.GetUser(name)
 	if err != nil {

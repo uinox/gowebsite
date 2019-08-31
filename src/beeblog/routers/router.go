@@ -69,4 +69,7 @@ func init() {
 
 	//rist
 	beego.Router("/rist", &controllers.RistController{}, "post:Rist")
+
+	//upload
+	beego.Router("/upload", &controllers.UploadController{})
 }

@@ -103,7 +103,7 @@
                 contentType:false,
                 success:function(result){
                     var ss = result
-                    var resobj = eval(ss)   //eval将json数据解析成json对象
+                    console.log(ss);
                     self.reload();
                 }
             });

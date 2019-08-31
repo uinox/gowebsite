@@ -74,9 +74,7 @@
                     processData:false,
                     contentType:false,
                     success:function(result){
-                        var ss = result;
-                        var resobj = eval(ss);   //eval将json数据解析成json对象
-                        if(resobj && resobj[0].status=="successfull"){
+                        if(result.Code=="200"){
                             self.$router.push('../article');
                         }
                     }

@@ -66,10 +66,7 @@
                   this.pwdError = true;
                   return;
                 }
-                var formData=new FormData(self.$refs.form);
-                formData.append('name',name);
-                formData.append('email',email);
-                formData.append('password',password);
+                var formData={'name':name,'email':email,'password':password};
                 var res2=[];
                 var url;
                 url='http://www.tmubei.com:8080/register';
@@ -78,12 +75,9 @@
                     type:"post",
                     url:url,
                     async: false,
-                    data:formData,  //
-                    // contentType:"application/json",
-                    contentType:false,
-                    // dataType:'json',
-                    processData:false,
-                    contentType:false,
+                    data:JSON.stringify(formData),  //
+                    contentType:"application/x-www-form-urlencoded",
+                    dataType:'json',
                     success:function(result){
                         var ss = result;
                         var resobj = eval(ss);   //eval将json数据解析成json对象

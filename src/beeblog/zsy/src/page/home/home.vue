@@ -87,7 +87,7 @@
 
 </script>
 <style lang="css">
-    ol{list-style-type: disc;padding: 0 50%;margin-left:-10px;}
+    ol{list-style-type: none;margin-left:-10px;text-align:center;}
     ol li {height:20px;line-height: 20px;}
     
     .topic{text-align: left;padding-left:10px;border-bottom: 1px solid #eee;padding-bottom: 10px;list-style-type: none;}

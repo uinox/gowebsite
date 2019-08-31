@@ -10,6 +10,11 @@ import (
 type TopicAtController struct {
 	beego.Controller
 }
+type JSONS struct {
+    //必须的大写开头
+    Code string
+    Msg  string
+}
 
 func (this *TopicAtController) Get() {
 
@@ -74,8 +79,8 @@ func (this *TopicAtController) Post() {
 	if err != nil {
 		beego.Error(err)
 	}
-
-	this.Data["json"] = "[{status:'successfull'}]"
+	data := &JSONS{"200","获取成功"}
+        this.Data["json"] = data
 	this.ServeJSON()
 
 	return
@@ -90,9 +95,9 @@ func (this *TopicAtController) Delete() {
 	err := models.DeleteTopic(this.Input().Get("tid"), this.Input().Get("category"))
 	if err != nil {
 		beego.Error(err)
-	}
-
-	this.Data["json"] = "[{status:'successfull'}]"
+	}	
+	data := &JSONS{"200","获取成功"}
+	this.Data["json"] = data
 	this.ServeJSON()
 
 	return
