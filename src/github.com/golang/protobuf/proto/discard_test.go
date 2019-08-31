@@ -34,8 +34,6 @@ package proto
 import (
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-
 	proto3pb "github.com/golang/protobuf/proto/proto3_proto"
 	pb "github.com/golang/protobuf/proto/test_proto"
 )
@@ -43,7 +41,7 @@ import (
 func TestDiscardUnknown(t *testing.T) {
 	tests := []struct {
 		desc     string
-		in, want proto.Message
+		in, want Message
 	}{{
 		desc: "Nil",
 		in:   nil, want: nil, // Should not panic
@@ -82,48 +80,48 @@ func TestDiscardUnknown(t *testing.T) {
 		desc: "OneOf",
 		in: &pb.Communique{
 			Union: &pb.Communique_Msg{&pb.Strings{
-				StringField:      proto.String("123"),
+				StringField:      String("123"),
 				XXX_unrecognized: []byte("blah"),
 			}},
 			XXX_unrecognized: []byte("blah"),
 		},
 		want: &pb.Communique{
-			Union: &pb.Communique_Msg{&pb.Strings{StringField: proto.String("123")}},
+			Union: &pb.Communique_Msg{&pb.Strings{StringField: String("123")}},
 		},
 	}, {
 		desc: "Map",
 		in: &pb.MessageWithMap{MsgMapping: map[int64]*pb.FloatingPoint{
 			0x4002: &pb.FloatingPoint{
-				Exact:            proto.Bool(true),
+				Exact:            Bool(true),
 				XXX_unrecognized: []byte("blah"),
 			},
 		}},
 		want: &pb.MessageWithMap{MsgMapping: map[int64]*pb.FloatingPoint{
-			0x4002: &pb.FloatingPoint{Exact: proto.Bool(true)},
+			0x4002: &pb.FloatingPoint{Exact: Bool(true)},
 		}},
 	}, {
 		desc: "Extension",
-		in: func() proto.Message {
+		in: func() Message {
 			m := &pb.MyMessage{
-				Count: proto.Int32(42),
+				Count: Int32(42),
 				Somegroup: &pb.MyMessage_SomeGroup{
-					GroupField:       proto.Int32(6),
+					GroupField:       Int32(6),
 					XXX_unrecognized: []byte("blah"),
 				},
 				XXX_unrecognized: []byte("blah"),
 			}
-			proto.SetExtension(m, pb.E_Ext_More, &pb.Ext{
-				Data:             proto.String("extension"),
+			SetExtension(m, pb.E_Ext_More, &pb.Ext{
+				Data:             String("extension"),
 				XXX_unrecognized: []byte("blah"),
 			})
 			return m
 		}(),
-		want: func() proto.Message {
+		want: func() Message {
 			m := &pb.MyMessage{
-				Count:     proto.Int32(42),
-				Somegroup: &pb.MyMessage_SomeGroup{GroupField: proto.Int32(6)},
+				Count:     Int32(42),
+				Somegroup: &pb.MyMessage_SomeGroup{GroupField: Int32(6)},
 			}
-			proto.SetExtension(m, pb.E_Ext_More, &pb.Ext{Data: proto.String("extension")})
+			SetExtension(m, pb.E_Ext_More, &pb.Ext{Data: String("extension")})
 			return m
 		}(),
 	}}
@@ -133,7 +131,7 @@ func TestDiscardUnknown(t *testing.T) {
 		// Clone the input so that we don't alter the original.
 		in := tt.in
 		if in != nil {
-			in = proto.Clone(tt.in)
+			in = Clone(tt.in)
 		}
 
 		var m LegacyMessage
@@ -141,15 +139,15 @@ func TestDiscardUnknown(t *testing.T) {
 		m.Communique, _ = in.(*pb.Communique)
 		m.MessageWithMap, _ = in.(*pb.MessageWithMap)
 		m.MyMessage, _ = in.(*pb.MyMessage)
-		proto.DiscardUnknown(&m)
-		if !proto.Equal(in, tt.want) {
+		DiscardUnknown(&m)
+		if !Equal(in, tt.want) {
 			t.Errorf("test %s/Legacy, expected unknown fields to be discarded\ngot  %v\nwant %v", tt.desc, in, tt.want)
 		}
 	}
 
 	for _, tt := range tests {
-		proto.DiscardUnknown(tt.in)
-		if !proto.Equal(tt.in, tt.want) {
+		DiscardUnknown(tt.in)
+		if !Equal(tt.in, tt.want) {
 			t.Errorf("test %s, expected unknown fields to be discarded\ngot  %v\nwant %v", tt.desc, tt.in, tt.want)
 		}
 	}
@@ -166,5 +164,5 @@ type LegacyMessage struct {
 }
 
 func (m *LegacyMessage) Reset()         { *m = LegacyMessage{} }
-func (m *LegacyMessage) String() string { return proto.CompactTextString(m) }
+func (m *LegacyMessage) String() string { return CompactTextString(m) }
 func (*LegacyMessage) ProtoMessage()    {}

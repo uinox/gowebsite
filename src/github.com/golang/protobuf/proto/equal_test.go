@@ -34,7 +34,6 @@ package proto
 import (
 	"testing"
 
-	. "github.com/golang/protobuf/proto"
 	proto3pb "github.com/golang/protobuf/proto/proto3_proto"
 	pb "github.com/golang/protobuf/proto/test_proto"
 )

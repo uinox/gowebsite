@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"strconv"
@@ -486,7 +487,7 @@ func DeleteReply(rid string) error {
 	return err
 } */
 
-func AddUser(name, password, email string) error {
+func AddUser(name, password, email string) int {
 	o := orm.NewOrm()
 
 	user := &User{
@@ -496,15 +497,17 @@ func AddUser(name, password, email string) error {
 		Created:  time.Now(),
 	}
 	qs := o.QueryTable("user")
-	err := qs.Filter("name", name).One(user)
+	err := qs.Filter("name", user.Name).One(user)
+	fmt.Println(err)
 	if err != nil {
 		_, err = o.Insert(user)
 		if err != nil {
-			return err
+			return 304
 		}
+		return 200
 	}
 
-	return err
+	return 301
 }
 
 func GetUser(name string) (*User, error) {
@@ -515,6 +518,7 @@ func GetUser(name string) (*User, error) {
 	qs := o.QueryTable("user")
 	err := qs.Filter("name", name).One(user)
 	if err != nil {
+		fmt.Println("aaa")
 		return nil, err
 	}
 

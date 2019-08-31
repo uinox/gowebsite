@@ -37,7 +37,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	tpb "github.com/golang/protobuf/proto/proto3_proto"
 	"github.com/golang/protobuf/ptypes"
 )
@@ -61,7 +60,7 @@ func BenchmarkAny(b *testing.B) {
 				if err != nil {
 					b.Error("wrong encode", err)
 				}
-				raw, err := proto.Marshal(&tpb.Message{
+				raw, err := Marshal(&tpb.Message{
 					Anything: outer,
 				})
 				if err != nil {
@@ -76,7 +75,7 @@ func BenchmarkAny(b *testing.B) {
 // BenchmarkEmpy measures the overhead of doing the minimal possible encode.
 func BenchmarkEmpy(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		raw, err := proto.Marshal(&tpb.Message{})
+		raw, err := Marshal(&tpb.Message{})
 		if err != nil {
 			b.Error("wrong encode", err)
 		}

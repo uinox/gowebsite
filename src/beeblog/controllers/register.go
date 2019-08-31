@@ -28,9 +28,6 @@ func (c *RegisterController) Get() {
 
 func (this *RegisterController) Post() {
 
-	//name := this.Input().Get("name")
-	//password := this.Input().Get("password")
-	//email := this.Input().Get("email")
 	var Person models.User
 
 	data := this.Ctx.Input.RequestBody
@@ -43,19 +40,18 @@ func (this *RegisterController) Post() {
 	password := Person.Password
 	email := Person.Email
 
-	fmt.Println("------")
-	fmt.Println(name)
-	fmt.Println(password)
-	fmt.Println(email)
 
-	err = models.AddUser(name, password, email)
-	if err != nil {
-		beego.Error(err)
-
+	state := models.AddUser(name, password, email)
+	if state == 301 {
+		this.Data["json"] = &JSON{"301","用户已存在"}
+	}
+	if state == 304 {
+		this.Data["json"] = &JSON{"304","添加用户失败"}
+	}
+	if state == 200 {
+		this.Data["json"] = &JSON{"200", "添加成功"}
 		return
 	}
-	res := &JSON{"200", "获取成功"}
-	this.Data["json"] = res
 	this.ServeJSON()
 	return
 }

@@ -37,7 +37,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	tpb "github.com/golang/protobuf/proto/proto3_proto"
 )
 
@@ -48,14 +47,14 @@ var msgBlackhole = new(tpb.Message)
 func BenchmarkVarint32ArraySmall(b *testing.B) {
 	for i := uint(1); i <= 10; i++ {
 		dist := genInt32Dist([7]int{0, 3, 1}, 1<<i)
-		raw, err := proto.Marshal(&tpb.Message{
+		raw, err := Marshal(&tpb.Message{
 			ShortKey: dist,
 		})
 		if err != nil {
 			b.Error("wrong encode", err)
 		}
 		b.Run(fmt.Sprintf("Len%v", len(dist)), func(b *testing.B) {
-			scratchBuf := proto.NewBuffer(nil)
+			scratchBuf := NewBuffer(nil)
 			b.ResetTimer()
 			for k := 0; k < b.N; k++ {
 				scratchBuf.SetBuf(raw)
@@ -73,14 +72,14 @@ func BenchmarkVarint32ArraySmall(b *testing.B) {
 func BenchmarkVarint32ArrayLarge(b *testing.B) {
 	for i := uint(1); i <= 10; i++ {
 		dist := genInt32Dist([7]int{0, 1, 2, 4, 8, 1, 1}, 1<<i)
-		raw, err := proto.Marshal(&tpb.Message{
+		raw, err := Marshal(&tpb.Message{
 			ShortKey: dist,
 		})
 		if err != nil {
 			b.Error("wrong encode", err)
 		}
 		b.Run(fmt.Sprintf("Len%v", len(dist)), func(b *testing.B) {
-			scratchBuf := proto.NewBuffer(nil)
+			scratchBuf := NewBuffer(nil)
 			b.ResetTimer()
 			for k := 0; k < b.N; k++ {
 				scratchBuf.SetBuf(raw)
@@ -98,14 +97,14 @@ func BenchmarkVarint32ArrayLarge(b *testing.B) {
 func BenchmarkVarint64ArraySmall(b *testing.B) {
 	for i := uint(1); i <= 10; i++ {
 		dist := genUint64Dist([11]int{0, 3, 1}, 1<<i)
-		raw, err := proto.Marshal(&tpb.Message{
+		raw, err := Marshal(&tpb.Message{
 			Key: dist,
 		})
 		if err != nil {
 			b.Error("wrong encode", err)
 		}
 		b.Run(fmt.Sprintf("Len%v", len(dist)), func(b *testing.B) {
-			scratchBuf := proto.NewBuffer(nil)
+			scratchBuf := NewBuffer(nil)
 			b.ResetTimer()
 			for k := 0; k < b.N; k++ {
 				scratchBuf.SetBuf(raw)
@@ -123,14 +122,14 @@ func BenchmarkVarint64ArraySmall(b *testing.B) {
 func BenchmarkVarint64ArrayLarge(b *testing.B) {
 	for i := uint(1); i <= 10; i++ {
 		dist := genUint64Dist([11]int{0, 1, 1, 2, 4, 8, 16, 32, 16, 1, 1}, 1<<i)
-		raw, err := proto.Marshal(&tpb.Message{
+		raw, err := Marshal(&tpb.Message{
 			Key: dist,
 		})
 		if err != nil {
 			b.Error("wrong encode", err)
 		}
 		b.Run(fmt.Sprintf("Len%v", len(dist)), func(b *testing.B) {
-			scratchBuf := proto.NewBuffer(nil)
+			scratchBuf := NewBuffer(nil)
 			b.ResetTimer()
 			for k := 0; k < b.N; k++ {
 				scratchBuf.SetBuf(raw)
@@ -156,12 +155,12 @@ func BenchmarkVarint64ArrayMixed(b *testing.B) {
 					Key: dist,
 				})
 			}
-			raw, err := proto.Marshal(msg)
+			raw, err := Marshal(msg)
 			if err != nil {
 				b.Error("wrong encode", err)
 			}
 			b.Run(fmt.Sprintf("Fields%vLen%v", k, i), func(b *testing.B) {
-				scratchBuf := proto.NewBuffer(nil)
+				scratchBuf := NewBuffer(nil)
 				b.ResetTimer()
 				for k := 0; k < b.N; k++ {
 					scratchBuf.SetBuf(raw)
@@ -242,13 +241,13 @@ func genUint64Dist(dist [11]int, count int) (dest []uint64) {
 
 // BenchmarkDecodeEmpty measures the overhead of doing the minimal possible decode.
 func BenchmarkDecodeEmpty(b *testing.B) {
-	raw, err := proto.Marshal(&tpb.Message{})
+	raw, err := Marshal(&tpb.Message{})
 	if err != nil {
 		b.Error("wrong encode", err)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if err := proto.Unmarshal(raw, msgBlackhole); err != nil {
+		if err := Unmarshal(raw, msgBlackhole); err != nil {
 			b.Error("wrong decode", err)
 		}
 	}

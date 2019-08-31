@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/golang/protobuf/descriptor"
 	tpb "github.com/golang/protobuf/proto/test_proto"
 	protobuf "github.com/golang/protobuf/protoc-gen-go/descriptor"
 )
 
 func TestMessage(t *testing.T) {
 	var msg *protobuf.DescriptorProto
-	fd, md := descriptor.ForMessage(msg)
+	fd, md := ForMessage(msg)
 	if pkg, want := fd.GetPackage(), "google.protobuf"; pkg != want {
 		t.Errorf("descriptor.ForMessage(%T).GetPackage() = %q; want %q", msg, pkg, want)
 	}
@@ -22,7 +21,7 @@ func TestMessage(t *testing.T) {
 
 func Example_options() {
 	var msg *tpb.MyMessageSet
-	_, md := descriptor.ForMessage(msg)
+	_, md := ForMessage(msg)
 	if md.GetOptions().GetMessageSetWireFormat() {
 		fmt.Printf("%v uses option message_set_wire_format.\n", md.GetName())
 	}

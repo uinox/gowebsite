@@ -35,7 +35,6 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	pb "github.com/golang/protobuf/proto/proto3_proto"
 	tpb "github.com/golang/protobuf/proto/test_proto"
 )
@@ -43,13 +42,13 @@ import (
 func TestProto3ZeroValues(t *testing.T) {
 	tests := []struct {
 		desc string
-		m    proto.Message
+		m    Message
 	}{
 		{"zero message", &pb.Message{}},
 		{"empty bytes field", &pb.Message{Data: []byte{}}},
 	}
 	for _, test := range tests {
-		b, err := proto.Marshal(test.m)
+		b, err := Marshal(test.m)
 		if err != nil {
 			t.Errorf("%s: proto.Marshal: %v", test.desc, err)
 			continue
@@ -77,19 +76,19 @@ func TestRoundTripProto3(t *testing.T) {
 	}
 	t.Logf(" m: %v", m)
 
-	b, err := proto.Marshal(m)
+	b, err := Marshal(m)
 	if err != nil {
 		t.Fatalf("proto.Marshal: %v", err)
 	}
 	t.Logf(" b: %q", b)
 
 	m2 := new(pb.Message)
-	if err := proto.Unmarshal(b, m2); err != nil {
+	if err := Unmarshal(b, m2); err != nil {
 		t.Fatalf("proto.Unmarshal: %v", err)
 	}
 	t.Logf("m2: %v", m2)
 
-	if !proto.Equal(m, m2) {
+	if !Equal(m, m2) {
 		t.Errorf("proto.Equal returned false:\n m: %v\nm2: %v", m, m2)
 	}
 }
@@ -115,8 +114,8 @@ func TestProto3SetDefaults(t *testing.T) {
 		},
 	}
 
-	got := proto.Clone(in).(*pb.Message)
-	proto.SetDefaults(got)
+	got := Clone(in).(*pb.Message)
+	SetDefaults(got)
 
 	// There are no defaults in proto3.  Everything should be the zero value, but
 	// we need to remember to set defaults for nested proto2 messages.
@@ -124,13 +123,13 @@ func TestProto3SetDefaults(t *testing.T) {
 		Terrain: map[string]*pb.Nested{
 			"meadow": new(pb.Nested),
 		},
-		Proto2Field: &tpb.SubDefaults{N: proto.Int64(7)},
+		Proto2Field: &tpb.SubDefaults{N: Int64(7)},
 		Proto2Value: map[string]*tpb.SubDefaults{
-			"badlands": &tpb.SubDefaults{N: proto.Int64(7)},
+			"badlands": &tpb.SubDefaults{N: Int64(7)},
 		},
 	}
 
-	if !proto.Equal(got, want) {
+	if !Equal(got, want) {
 		t.Errorf("with in = %v\nproto.SetDefaults(in) =>\ngot %v\nwant %v", in, got, want)
 	}
 }
@@ -141,7 +140,7 @@ func TestUnknownFieldPreservation(t *testing.T) {
 	b := []byte(b1 + b2)
 
 	m := new(pb.Message)
-	if err := proto.Unmarshal(b, m); err != nil {
+	if err := Unmarshal(b, m); err != nil {
 		t.Fatalf("proto.Unmarshal: %v", err)
 	}
 

@@ -35,16 +35,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-
 	pb "github.com/golang/protobuf/proto/proto3_proto"
 	testpb "github.com/golang/protobuf/proto/test_proto"
 	anypb "github.com/golang/protobuf/ptypes/any"
 )
 
 var (
-	expandedMarshaler        = proto.TextMarshaler{ExpandAny: true}
-	expandedCompactMarshaler = proto.TextMarshaler{Compact: true, ExpandAny: true}
+	expandedMarshaler        = TextMarshaler{ExpandAny: true}
+	expandedCompactMarshaler = TextMarshaler{Compact: true, ExpandAny: true}
 )
 
 // anyEqual reports whether two messages which may be google.protobuf.Any or may
@@ -52,9 +50,9 @@ var (
 // comparison, because semantically equivalent messages may be marshaled to
 // binary in different tag order. Instead, trust that TextMarshaler with
 // ExpandAny option works and compare the text marshaling results.
-func anyEqual(got, want proto.Message) bool {
+func anyEqual(got, want Message) bool {
 	// if messages are proto.Equal, no need to marshal.
-	if proto.Equal(got, want) {
+	if Equal(got, want) {
 		return true
 	}
 	g := expandedMarshaler.Text(got)
@@ -63,7 +61,7 @@ func anyEqual(got, want proto.Message) bool {
 }
 
 type golden struct {
-	m    proto.Message
+	m    Message
 	t, c string
 }
 
@@ -71,52 +69,52 @@ var goldenMessages = makeGolden()
 
 func makeGolden() []golden {
 	nested := &pb.Nested{Bunny: "Monty"}
-	nb, err := proto.Marshal(nested)
+	nb, err := Marshal(nested)
 	if err != nil {
 		panic(err)
 	}
 	m1 := &pb.Message{
 		Name:        "David",
 		ResultCount: 47,
-		Anything:    &anypb.Any{TypeUrl: "type.googleapis.com/" + proto.MessageName(nested), Value: nb},
+		Anything:    &anypb.Any{TypeUrl: "type.googleapis.com/" + MessageName(nested), Value: nb},
 	}
 	m2 := &pb.Message{
 		Name:        "David",
 		ResultCount: 47,
-		Anything:    &anypb.Any{TypeUrl: "http://[::1]/type.googleapis.com/" + proto.MessageName(nested), Value: nb},
+		Anything:    &anypb.Any{TypeUrl: "http://[::1]/type.googleapis.com/" + MessageName(nested), Value: nb},
 	}
 	m3 := &pb.Message{
 		Name:        "David",
 		ResultCount: 47,
-		Anything:    &anypb.Any{TypeUrl: `type.googleapis.com/"/` + proto.MessageName(nested), Value: nb},
+		Anything:    &anypb.Any{TypeUrl: `type.googleapis.com/"/` + MessageName(nested), Value: nb},
 	}
 	m4 := &pb.Message{
 		Name:        "David",
 		ResultCount: 47,
-		Anything:    &anypb.Any{TypeUrl: "type.googleapis.com/a/path/" + proto.MessageName(nested), Value: nb},
+		Anything:    &anypb.Any{TypeUrl: "type.googleapis.com/a/path/" + MessageName(nested), Value: nb},
 	}
-	m5 := &anypb.Any{TypeUrl: "type.googleapis.com/" + proto.MessageName(nested), Value: nb}
+	m5 := &anypb.Any{TypeUrl: "type.googleapis.com/" + MessageName(nested), Value: nb}
 
-	any1 := &testpb.MyMessage{Count: proto.Int32(47), Name: proto.String("David")}
-	proto.SetExtension(any1, testpb.E_Ext_More, &testpb.Ext{Data: proto.String("foo")})
-	proto.SetExtension(any1, testpb.E_Ext_Text, proto.String("bar"))
-	any1b, err := proto.Marshal(any1)
+	any1 := &testpb.MyMessage{Count: Int32(47), Name: String("David")}
+	SetExtension(any1, testpb.E_Ext_More, &testpb.Ext{Data: String("foo")})
+	SetExtension(any1, testpb.E_Ext_Text, String("bar"))
+	any1b, err := Marshal(any1)
 	if err != nil {
 		panic(err)
 	}
-	any2 := &testpb.MyMessage{Count: proto.Int32(42), Bikeshed: testpb.MyMessage_GREEN.Enum(), RepBytes: [][]byte{[]byte("roboto")}}
-	proto.SetExtension(any2, testpb.E_Ext_More, &testpb.Ext{Data: proto.String("baz")})
-	any2b, err := proto.Marshal(any2)
+	any2 := &testpb.MyMessage{Count: Int32(42), Bikeshed: testpb.MyMessage_GREEN.Enum(), RepBytes: [][]byte{[]byte("roboto")}}
+	SetExtension(any2, testpb.E_Ext_More, &testpb.Ext{Data: String("baz")})
+	any2b, err := Marshal(any2)
 	if err != nil {
 		panic(err)
 	}
 	m6 := &pb.Message{
 		Name:        "David",
 		ResultCount: 47,
-		Anything:    &anypb.Any{TypeUrl: "type.googleapis.com/" + proto.MessageName(any1), Value: any1b},
+		Anything:    &anypb.Any{TypeUrl: "type.googleapis.com/" + MessageName(any1), Value: any1b},
 		ManyThings: []*anypb.Any{
-			&anypb.Any{TypeUrl: "type.googleapis.com/" + proto.MessageName(any2), Value: any2b},
-			&anypb.Any{TypeUrl: "type.googleapis.com/" + proto.MessageName(any1), Value: any1b},
+			&anypb.Any{TypeUrl: "type.googleapis.com/" + MessageName(any2), Value: any2b},
+			&anypb.Any{TypeUrl: "type.googleapis.com/" + MessageName(any1), Value: any1b},
 		},
 	}
 
@@ -221,16 +219,16 @@ func TestMarshalGolden(t *testing.T) {
 func TestUnmarshalGolden(t *testing.T) {
 	for _, tt := range goldenMessages {
 		want := tt.m
-		got := proto.Clone(tt.m)
+		got := Clone(tt.m)
 		got.Reset()
-		if err := proto.UnmarshalText(tt.t, got); err != nil {
+		if err := UnmarshalText(tt.t, got); err != nil {
 			t.Errorf("failed to unmarshal\n%s\nerror: %v", tt.t, err)
 		}
 		if !anyEqual(got, want) {
 			t.Errorf("message:\n%s\ngot:\n%s\nwant:\n%s", tt.t, got, want)
 		}
 		got.Reset()
-		if err := proto.UnmarshalText(tt.c, got); err != nil {
+		if err := UnmarshalText(tt.c, got); err != nil {
 			t.Errorf("failed to unmarshal\n%s\nerror: %v", tt.c, err)
 		}
 		if !anyEqual(got, want) {
@@ -259,7 +257,7 @@ func TestMarshalUnknownAny(t *testing.T) {
 
 func TestAmbiguousAny(t *testing.T) {
 	pb := &anypb.Any{}
-	err := proto.UnmarshalText(`
+	err := UnmarshalText(`
 	type_url: "ttt/proto3_proto.Nested"
 	value: "\n\x05Monty"
 	`, pb)
@@ -271,7 +269,7 @@ func TestAmbiguousAny(t *testing.T) {
 
 func TestUnmarshalOverwriteAny(t *testing.T) {
 	pb := &anypb.Any{}
-	err := proto.UnmarshalText(`
+	err := UnmarshalText(`
   [type.googleapis.com/a/path/proto3_proto.Nested]: <
     bunny: "Monty"
   >
@@ -287,7 +285,7 @@ func TestUnmarshalOverwriteAny(t *testing.T) {
 
 func TestUnmarshalAnyMixAndMatch(t *testing.T) {
 	pb := &anypb.Any{}
-	err := proto.UnmarshalText(`
+	err := UnmarshalText(`
 	value: "\n\x05Monty"
   [type.googleapis.com/a/path/proto3_proto.Nested]: <
     bunny: "Rabbit of Caerbannog"

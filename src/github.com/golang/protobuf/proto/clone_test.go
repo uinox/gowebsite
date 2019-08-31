@@ -34,20 +34,18 @@ package proto
 import (
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-
 	proto3pb "github.com/golang/protobuf/proto/proto3_proto"
 	pb "github.com/golang/protobuf/proto/test_proto"
 )
 
 var cloneTestMessage = &pb.MyMessage{
-	Count: proto.Int32(42),
-	Name:  proto.String("Dave"),
+	Count: Int32(42),
+	Name:  String("Dave"),
 	Pet:   []string{"bunny", "kitty", "horsey"},
 	Inner: &pb.InnerMessage{
-		Host:      proto.String("niles"),
-		Port:      proto.Int32(9099),
-		Connected: proto.Bool(true),
+		Host:      String("niles"),
+		Port:      Int32(9099),
+		Connected: Bool(true),
 	},
 	Others: []*pb.OtherMessage{
 		{
@@ -55,29 +53,29 @@ var cloneTestMessage = &pb.MyMessage{
 		},
 	},
 	Somegroup: &pb.MyMessage_SomeGroup{
-		GroupField: proto.Int32(6),
+		GroupField: Int32(6),
 	},
 	RepBytes: [][]byte{[]byte("sham"), []byte("wow")},
 }
 
 func init() {
 	ext := &pb.Ext{
-		Data: proto.String("extension"),
+		Data: String("extension"),
 	}
-	if err := proto.SetExtension(cloneTestMessage, pb.E_Ext_More, ext); err != nil {
+	if err := SetExtension(cloneTestMessage, pb.E_Ext_More, ext); err != nil {
 		panic("SetExtension: " + err.Error())
 	}
 }
 
 func TestClone(t *testing.T) {
-	m := proto.Clone(cloneTestMessage).(*pb.MyMessage)
-	if !proto.Equal(m, cloneTestMessage) {
+	m := Clone(cloneTestMessage).(*pb.MyMessage)
+	if !Equal(m, cloneTestMessage) {
 		t.Fatalf("Clone(%v) = %v", cloneTestMessage, m)
 	}
 
 	// Verify it was a deep copy.
 	*m.Inner.Port++
-	if proto.Equal(m, cloneTestMessage) {
+	if Equal(m, cloneTestMessage) {
 		t.Error("Mutating clone changed the original")
 	}
 	// Byte fields and repeated fields should be copied.
@@ -100,31 +98,31 @@ func TestClone(t *testing.T) {
 
 func TestCloneNil(t *testing.T) {
 	var m *pb.MyMessage
-	if c := proto.Clone(m); !proto.Equal(m, c) {
+	if c := Clone(m); !Equal(m, c) {
 		t.Errorf("Clone(%v) = %v", m, c)
 	}
 }
 
 var mergeTests = []struct {
-	src, dst, want proto.Message
+	src, dst, want Message
 }{
 	{
 		src: &pb.MyMessage{
-			Count: proto.Int32(42),
+			Count: Int32(42),
 		},
 		dst: &pb.MyMessage{
-			Name: proto.String("Dave"),
+			Name: String("Dave"),
 		},
 		want: &pb.MyMessage{
-			Count: proto.Int32(42),
-			Name:  proto.String("Dave"),
+			Count: Int32(42),
+			Name:  String("Dave"),
 		},
 	},
 	{
 		src: &pb.MyMessage{
 			Inner: &pb.InnerMessage{
-				Host:      proto.String("hey"),
-				Connected: proto.Bool(true),
+				Host:      String("hey"),
+				Connected: Bool(true),
 			},
 			Pet: []string{"horsey"},
 			Others: []*pb.OtherMessage{
@@ -135,13 +133,13 @@ var mergeTests = []struct {
 		},
 		dst: &pb.MyMessage{
 			Inner: &pb.InnerMessage{
-				Host: proto.String("niles"),
-				Port: proto.Int32(9099),
+				Host: String("niles"),
+				Port: Int32(9099),
 			},
 			Pet: []string{"bunny", "kitty"},
 			Others: []*pb.OtherMessage{
 				{
-					Key: proto.Int64(31415926535),
+					Key: Int64(31415926535),
 				},
 				{
 					// Explicitly test a src=nil field
@@ -151,14 +149,14 @@ var mergeTests = []struct {
 		},
 		want: &pb.MyMessage{
 			Inner: &pb.InnerMessage{
-				Host:      proto.String("hey"),
-				Connected: proto.Bool(true),
-				Port:      proto.Int32(9099),
+				Host:      String("hey"),
+				Connected: Bool(true),
+				Port:      Int32(9099),
 			},
 			Pet: []string{"bunny", "kitty", "horsey"},
 			Others: []*pb.OtherMessage{
 				{
-					Key: proto.Int64(31415926535),
+					Key: Int64(31415926535),
 				},
 				{},
 				{
@@ -173,13 +171,13 @@ var mergeTests = []struct {
 		},
 		dst: &pb.MyMessage{
 			Somegroup: &pb.MyMessage_SomeGroup{
-				GroupField: proto.Int32(6),
+				GroupField: Int32(6),
 			},
 			RepBytes: [][]byte{[]byte("sham")},
 		},
 		want: &pb.MyMessage{
 			Somegroup: &pb.MyMessage_SomeGroup{
-				GroupField: proto.Int32(6),
+				GroupField: Int32(6),
 			},
 			RepBytes: [][]byte{[]byte("sham"), []byte("wow")},
 		},
@@ -194,9 +192,9 @@ var mergeTests = []struct {
 		src: &pb.MessageWithMap{
 			NameMapping: map[int32]string{6: "Nigel"},
 			MsgMapping: map[int64]*pb.FloatingPoint{
-				0x4001: &pb.FloatingPoint{F: proto.Float64(2.0)},
+				0x4001: &pb.FloatingPoint{F: Float64(2.0)},
 				0x4002: &pb.FloatingPoint{
-					F: proto.Float64(2.0),
+					F: Float64(2.0),
 				},
 			},
 			ByteMapping: map[bool][]byte{true: []byte("wowsa")},
@@ -208,8 +206,8 @@ var mergeTests = []struct {
 			},
 			MsgMapping: map[int64]*pb.FloatingPoint{
 				0x4002: &pb.FloatingPoint{
-					F:     proto.Float64(3.0),
-					Exact: proto.Bool(true),
+					F:     Float64(3.0),
+					Exact: Bool(true),
 				}, // the entire message should be overwritten
 			},
 		},
@@ -219,9 +217,9 @@ var mergeTests = []struct {
 				7: "Andrew",
 			},
 			MsgMapping: map[int64]*pb.FloatingPoint{
-				0x4001: &pb.FloatingPoint{F: proto.Float64(2.0)},
+				0x4001: &pb.FloatingPoint{F: Float64(2.0)},
 				0x4002: &pb.FloatingPoint{
-					F: proto.Float64(2.0),
+					F: Float64(2.0),
 				},
 			},
 			ByteMapping: map[bool][]byte{true: []byte("wowsa")},
@@ -280,9 +278,9 @@ var mergeTests = []struct {
 		want: &pb.Communique{Union: &pb.Communique_Msg{}},
 	},
 	{
-		src:  &pb.Communique{Union: &pb.Communique_Msg{&pb.Strings{StringField: proto.String("123")}}},
+		src:  &pb.Communique{Union: &pb.Communique_Msg{&pb.Strings{StringField: String("123")}}},
 		dst:  &pb.Communique{Union: &pb.Communique_Msg{&pb.Strings{BytesField: []byte{1, 2, 3}}}},
-		want: &pb.Communique{Union: &pb.Communique_Msg{&pb.Strings{StringField: proto.String("123"), BytesField: []byte{1, 2, 3}}}},
+		want: &pb.Communique{Union: &pb.Communique_Msg{&pb.Strings{StringField: String("123"), BytesField: []byte{1, 2, 3}}}},
 	},
 	{
 		src: &proto3pb.Message{
@@ -377,13 +375,13 @@ var mergeTests = []struct {
 
 func TestMerge(t *testing.T) {
 	for _, m := range mergeTests {
-		got := proto.Clone(m.dst)
-		if !proto.Equal(got, m.dst) {
+		got := Clone(m.dst)
+		if !Equal(got, m.dst) {
 			t.Errorf("Clone()\ngot  %v\nwant %v", got, m.dst)
 			continue
 		}
-		proto.Merge(got, m.src)
-		if !proto.Equal(got, m.want) {
+		Merge(got, m.src)
+		if !Equal(got, m.want) {
 			t.Errorf("Merge(%v, %v)\ngot  %v\nwant %v", m.dst, m.src, got, m.want)
 		}
 	}

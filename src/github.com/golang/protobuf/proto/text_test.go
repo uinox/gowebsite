@@ -40,8 +40,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-
 	proto3pb "github.com/golang/protobuf/proto/proto3_proto"
 	pb "github.com/golang/protobuf/proto/test_proto"
 	anypb "github.com/golang/protobuf/ptypes/any"
@@ -69,58 +67,58 @@ func (*textMessage) ProtoMessage()  {}
 
 func newTestMessage() *pb.MyMessage {
 	msg := &pb.MyMessage{
-		Count: proto.Int32(42),
-		Name:  proto.String("Dave"),
-		Quote: proto.String(`"I didn't want to go."`),
+		Count: Int32(42),
+		Name:  String("Dave"),
+		Quote: String(`"I didn't want to go."`),
 		Pet:   []string{"bunny", "kitty", "horsey"},
 		Inner: &pb.InnerMessage{
-			Host:      proto.String("footrest.syd"),
-			Port:      proto.Int32(7001),
-			Connected: proto.Bool(true),
+			Host:      String("footrest.syd"),
+			Port:      Int32(7001),
+			Connected: Bool(true),
 		},
 		Others: []*pb.OtherMessage{
 			{
-				Key:   proto.Int64(0xdeadbeef),
+				Key:   Int64(0xdeadbeef),
 				Value: []byte{1, 65, 7, 12},
 			},
 			{
-				Weight: proto.Float32(6.022),
+				Weight: Float32(6.022),
 				Inner: &pb.InnerMessage{
-					Host: proto.String("lesha.mtv"),
-					Port: proto.Int32(8002),
+					Host: String("lesha.mtv"),
+					Port: Int32(8002),
 				},
 			},
 		},
 		Bikeshed: pb.MyMessage_BLUE.Enum(),
 		Somegroup: &pb.MyMessage_SomeGroup{
-			GroupField: proto.Int32(8),
+			GroupField: Int32(8),
 		},
 		// One normally wouldn't do this.
 		// This is an undeclared tag 13, as a varint (wire type 0) with value 4.
 		XXX_unrecognized: []byte{13<<3 | 0, 4},
 	}
 	ext := &pb.Ext{
-		Data: proto.String("Big gobs for big rats"),
+		Data: String("Big gobs for big rats"),
 	}
-	if err := proto.SetExtension(msg, pb.E_Ext_More, ext); err != nil {
+	if err := SetExtension(msg, pb.E_Ext_More, ext); err != nil {
 		panic(err)
 	}
 	greetings := []string{"adg", "easy", "cow"}
-	if err := proto.SetExtension(msg, pb.E_Greeting, greetings); err != nil {
+	if err := SetExtension(msg, pb.E_Greeting, greetings); err != nil {
 		panic(err)
 	}
 
 	// Add an unknown extension. We marshal a pb.Ext, and fake the ID.
-	b, err := proto.Marshal(&pb.Ext{Data: proto.String("3G skiing")})
+	b, err := Marshal(&pb.Ext{Data: String("3G skiing")})
 	if err != nil {
 		panic(err)
 	}
-	b = append(proto.EncodeVarint(201<<3|proto.WireBytes), b...)
-	proto.SetRawExtension(msg, 201, b)
+	b = append(EncodeVarint(201<<3|WireBytes), b...)
+	SetRawExtension(msg, 201, b)
 
 	// Extensions can be plain fields, too, so let's test that.
-	b = append(proto.EncodeVarint(202<<3|proto.WireVarint), 19)
-	proto.SetRawExtension(msg, 202, b)
+	b = append(EncodeVarint(202<<3|WireVarint), 19)
+	SetRawExtension(msg, 202, b)
 
 	return msg
 }
@@ -167,7 +165,7 @@ SomeGroup {
 
 func TestMarshalText(t *testing.T) {
 	buf := new(bytes.Buffer)
-	if err := proto.MarshalText(buf, newTestMessage()); err != nil {
+	if err := MarshalText(buf, newTestMessage()); err != nil {
 		t.Fatalf("proto.MarshalText: %v", err)
 	}
 	s := buf.String()
@@ -178,7 +176,7 @@ func TestMarshalText(t *testing.T) {
 
 func TestMarshalTextCustomMessage(t *testing.T) {
 	buf := new(bytes.Buffer)
-	if err := proto.MarshalText(buf, &textMessage{}); err != nil {
+	if err := MarshalText(buf, &textMessage{}); err != nil {
 		t.Fatalf("proto.MarshalText: %v", err)
 	}
 	s := buf.String()
@@ -188,10 +186,10 @@ func TestMarshalTextCustomMessage(t *testing.T) {
 }
 func TestMarshalTextNil(t *testing.T) {
 	want := "<nil>"
-	tests := []proto.Message{nil, (*pb.MyMessage)(nil)}
+	tests := []Message{nil, (*pb.MyMessage)(nil)}
 	for i, test := range tests {
 		buf := new(bytes.Buffer)
-		if err := proto.MarshalText(buf, test); err != nil {
+		if err := MarshalText(buf, test); err != nil {
 			t.Fatal(err)
 		}
 		if got := buf.String(); got != want {
@@ -212,7 +210,7 @@ func TestMarshalTextUnknownEnum(t *testing.T) {
 
 func TestTextOneof(t *testing.T) {
 	tests := []struct {
-		m    proto.Message
+		m    Message
 		want string
 	}{
 		// zero message
@@ -221,7 +219,7 @@ func TestTextOneof(t *testing.T) {
 		{&pb.Communique{Union: &pb.Communique_Number{4}}, `number:4`},
 		// message field
 		{&pb.Communique{Union: &pb.Communique_Msg{
-			&pb.Strings{StringField: proto.String("why hello!")},
+			&pb.Strings{StringField: String("why hello!")},
 		}}, `msg:<string_field:"why hello!" >`},
 		// bad oneof (should not panic)
 		{&pb.Communique{Union: &pb.Communique_Msg{nil}}, `msg:/* nil */`},
@@ -239,7 +237,7 @@ func BenchmarkMarshalTextBuffered(b *testing.B) {
 	m := newTestMessage()
 	for i := 0; i < b.N; i++ {
 		buf.Reset()
-		proto.MarshalText(buf, m)
+		MarshalText(buf, m)
 	}
 }
 
@@ -247,7 +245,7 @@ func BenchmarkMarshalTextUnbuffered(b *testing.B) {
 	w := ioutil.Discard
 	m := newTestMessage()
 	for i := 0; i < b.N; i++ {
-		proto.MarshalText(w, m)
+		MarshalText(w, m)
 	}
 }
 
@@ -299,7 +297,7 @@ func compact(src string) string {
 var compactText = compact(text)
 
 func TestCompactText(t *testing.T) {
-	s := proto.CompactTextString(newTestMessage())
+	s := CompactTextString(newTestMessage())
 	if s != compactText {
 		t.Errorf("Got:\n===\n%v===\nExpected:\n===\n%v\n===\n", s, compactText)
 	}
@@ -313,24 +311,24 @@ func TestStringEscaping(t *testing.T) {
 		{
 			// Test data from C++ test (TextFormatTest.StringEscape).
 			// Single divergence: we don't escape apostrophes.
-			&pb.Strings{StringField: proto.String("\"A string with ' characters \n and \r newlines and \t tabs and \001 slashes \\ and  multiple   spaces")},
+			&pb.Strings{StringField: String("\"A string with ' characters \n and \r newlines and \t tabs and \001 slashes \\ and  multiple   spaces")},
 			"string_field: \"\\\"A string with ' characters \\n and \\r newlines and \\t tabs and \\001 slashes \\\\ and  multiple   spaces\"\n",
 		},
 		{
 			// Test data from the same C++ test.
-			&pb.Strings{StringField: proto.String("\350\260\267\346\255\214")},
+			&pb.Strings{StringField: String("\350\260\267\346\255\214")},
 			"string_field: \"\\350\\260\\267\\346\\255\\214\"\n",
 		},
 		{
 			// Some UTF-8.
-			&pb.Strings{StringField: proto.String("\x00\x01\xff\x81")},
+			&pb.Strings{StringField: String("\x00\x01\xff\x81")},
 			`string_field: "\000\001\377\201"` + "\n",
 		},
 	}
 
 	for i, tc := range testCases {
 		var buf bytes.Buffer
-		if err := proto.MarshalText(&buf, tc.in); err != nil {
+		if err := MarshalText(&buf, tc.in); err != nil {
 			t.Errorf("proto.MarsalText: %v", err)
 			continue
 		}
@@ -342,11 +340,11 @@ func TestStringEscaping(t *testing.T) {
 
 		// Check round-trip.
 		pb := new(pb.Strings)
-		if err := proto.UnmarshalText(s, pb); err != nil {
+		if err := UnmarshalText(s, pb); err != nil {
 			t.Errorf("#%d: UnmarshalText: %v", i, err)
 			continue
 		}
-		if !proto.Equal(pb, tc.in) {
+		if !Equal(pb, tc.in) {
 			t.Errorf("#%d: Round-trip failed:\nstart: %v\n  end: %v", i, tc.in, pb)
 		}
 	}
@@ -379,7 +377,7 @@ func TestMarshalTextFailing(t *testing.T) {
 	for lim := 0; lim < len(text); lim++ {
 		buf := new(limitedWriter)
 		buf.limit = lim
-		err := proto.MarshalText(buf, newTestMessage())
+		err := MarshalText(buf, newTestMessage())
 		// We expect a certain error, but also some partial results in the buffer.
 		if err != outOfSpace {
 			t.Errorf("Got:\n===\n%v===\nExpected:\n===\n%v===\n", err, outOfSpace)
@@ -418,7 +416,7 @@ func TestRepeatedNilText(t *testing.T) {
 		Message: []*pb.MessageList_Message{
 			nil,
 			&pb.MessageList_Message{
-				Name: proto.String("Horse"),
+				Name: String("Horse"),
 			},
 			nil,
 		},
@@ -429,14 +427,14 @@ Message {
 }
 Message <nil>
 `
-	if s := proto.MarshalTextString(m); s != want {
+	if s := MarshalTextString(m); s != want {
 		t.Errorf(" got: %s\nwant: %s", s, want)
 	}
 }
 
 func TestProto3Text(t *testing.T) {
 	tests := []struct {
-		m    proto.Message
+		m    Message
 		want string
 	}{
 		// zero message
@@ -478,20 +476,20 @@ func TestProto3Text(t *testing.T) {
 func TestRacyMarshal(t *testing.T) {
 	// This test should be run with the race detector.
 
-	any := &pb.MyMessage{Count: proto.Int32(47), Name: proto.String("David")}
-	proto.SetExtension(any, pb.E_Ext_Text, proto.String("bar"))
-	b, err := proto.Marshal(any)
+	any := &pb.MyMessage{Count: Int32(47), Name: String("David")}
+	SetExtension(any, pb.E_Ext_Text, String("bar"))
+	b, err := Marshal(any)
 	if err != nil {
 		panic(err)
 	}
 	m := &proto3pb.Message{
 		Name:        "David",
 		ResultCount: 47,
-		Anything:    &anypb.Any{TypeUrl: "type.googleapis.com/" + proto.MessageName(any), Value: b},
+		Anything:    &anypb.Any{TypeUrl: "type.googleapis.com/" + MessageName(any), Value: b},
 	}
 
-	wantText := proto.MarshalTextString(m)
-	wantBytes, err := proto.Marshal(m)
+	wantText := MarshalTextString(m)
+	wantBytes, err := Marshal(m)
 	if err != nil {
 		t.Fatalf("proto.Marshal error: %v", err)
 	}
@@ -502,14 +500,14 @@ func TestRacyMarshal(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		go func() {
 			defer wg.Done()
-			got := proto.MarshalTextString(m)
+			got := MarshalTextString(m)
 			if got != wantText {
 				t.Errorf("proto.MarshalTextString = %q, want %q", got, wantText)
 			}
 		}()
 		go func() {
 			defer wg.Done()
-			got, err := proto.Marshal(m)
+			got, err := Marshal(m)
 			if !bytes.Equal(got, wantBytes) || err != nil {
 				t.Errorf("proto.Marshal = (%x, %v), want (%x, nil)", got, err, wantBytes)
 			}
