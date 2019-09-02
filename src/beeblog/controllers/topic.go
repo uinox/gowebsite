@@ -37,6 +37,7 @@ func (this *TopicController) Post() {
 	content := this.Input().Get("content")
 	category := this.Input().Get("category")
 	label := this.Input().Get("label")
+	author := this.Input().Get("author")
 
 	//获取附件
 	_, fh, err := this.GetFile("attachment")
@@ -55,9 +56,18 @@ func (this *TopicController) Post() {
 		}
 	}
 
+	//获取用户
+	user := &models.User{}
+	user, err = models.GetUser(author)
+	if err != nil {
+		beego.Error(err)
+	}
+	uid := user.Id
+	fmt.Println(uid)
+
 	// var err error
 	if len(tid) == 0 {
-		err = models.AddTopic(title, category, label, content, attachment)
+		err = models.AddTopic(uid, title, category, label, content, author, attachment)
 	} else {
 		err = models.ModifyTopic(tid, title, category, label, content, attachment)
 	}

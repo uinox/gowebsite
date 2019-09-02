@@ -136,7 +136,7 @@ func GetAllCategories() ([]*Category, error) {
 	return cates, err
 }
 
-func AddTopic(title, category, label, content, attachment string) error {
+func AddTopic(uid int64, title, category, label, content, author , attachment string) error {
 
 	//处理标签
 	label = "$" + strings.Join(strings.Split(label, " "), "$#") + "#"
@@ -151,6 +151,8 @@ func AddTopic(title, category, label, content, attachment string) error {
 		Attachment: attachment,
 		Created:    time.Now(),
 		Updated:    time.Now(),
+		Author:		author,
+		Uid:		uid,
 	}
 
 	_, err := o.Insert(topic)
